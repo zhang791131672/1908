@@ -29,7 +29,7 @@ class ArticleController extends Controller
         //Cache::flush();die;
         $cateInfo=Cache::get('cateInfo');
         if(!$cateInfo){
-            //echo "数据库";
+            //echo "数据库111111";
             $cateInfo=Category::get();
             Cache::put('cateInfo',$cateInfo,60*5);
         }

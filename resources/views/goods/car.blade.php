@@ -50,7 +50,7 @@
         <table>
             <tr>
                 <th width="10%"><a href="javascript:history.back(-1)"><span class="glyphicon glyphicon-menu-left"></span></a></th>
-                <td width="50%">总计：<strong class="orange">¥69.88</strong></td>
+                <td width="50%">总计：<strong class="orange" id="money">¥69.88</strong></td>
                 <td width="40%"><a href="pay.html" class="jiesuan">去结算</a></td>
             </tr>
         </table>
@@ -172,7 +172,7 @@
                 data: {goods_id: goods_id},//ajax传值,传过去的可能是一个值,也可能是多个
                 type: 'post',
                 success: function (res) {
-                    //$("#money").text("￥"+res);//用返回值替换总价
+                    $("#money").text(res);//用返回值替换总价
                 }
             })
         }

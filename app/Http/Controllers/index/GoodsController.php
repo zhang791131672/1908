@@ -134,13 +134,14 @@ class GoodsController extends Controller
         echo $money;
     }
     function getMoneyDb($goods_id){
-        $where=[
+        $goods_id=explode(',',$goods_id);
+       $where=[
             ['user_id','=',session('user_id')],
-            ['cart.goods_id','in',$goods_id],
             ['cart_del','=',1],
         ];
         $info=Cart::leftjoin("goods",'goods.goods_id','=','cart.goods_id')
             ->where($where)
+            ->whereIn('cart.goods_id',$goods_id)
             ->select("buy_number","goods_price")
             ->get();
         $money=0;
@@ -148,7 +149,6 @@ class GoodsController extends Controller
             $money+=$v['buy_number']*$v['goods_price'];
         }
         $money=$money*0.5;
-        dd($money);die;
         return $money;
     }
 }
