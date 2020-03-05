@@ -27,6 +27,11 @@ Route::get('/car/index','Index\GoodsController@CarIndex');
 Route::post('/cart/changeNumber','Index\GoodsController@changeNumber');
 Route::post('/cart/getTotal','Index\GoodsController@getTotal');
 Route::post('/cart/getMoney','Index\GoodsController@getMoney');
+Route::any('/pay/{goods_id}','Index\PayController@index');
+Route::post('/confirmOrder','Index\PayController@confirmOrder');
+Route::get('/success','Index\PayController@success');
+Route::get('/payMoney/{oredersn}','Index\PayController@payMoney');
+Route::get('/pay/return_url','Index\PayController@return_url');
 
 
 //Route::get('/brand/add','BrandController@add');

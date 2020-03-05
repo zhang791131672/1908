@@ -50,8 +50,8 @@
         <table>
             <tr>
                 <th width="10%"><a href="javascript:history.back(-1)"><span class="glyphicon glyphicon-menu-left"></span></a></th>
-                <td width="50%">总计：<strong class="orange" id="money">¥69.88</strong></td>
-                <td width="40%"><a href="pay.html" class="jiesuan">去结算</a></td>
+                <td width="50%">总计：<strong class="orange" id="money">¥0</strong></td>
+                <td width="40%"><a href="javascript:;" class="jiesuan">去结算</a></td>
             </tr>
         </table>
     </div><!--gwcpiao/-->
@@ -64,66 +64,58 @@
            var _this=$(this);
            var buy_number=parseInt(_this.prev("input").val());
             var goods_num=parseInt(_this.parents("tr").attr("goods_num"));
-            if(buy_number>=goods_num){  //如果购买数量大于等于库存
-                _this.prev("input").val(goods_num);   //把购买数量变成库存
+            if(buy_number>=goods_num){
+                _this.prev("input").val(goods_num);
                 return false;
             }else{
-                buy_number=buy_number+1;       //否则的话把购买数量+1
-                _this.prev("input").val(buy_number);   //然后放回文本框里
+                buy_number=buy_number+1;
+                _this.prev("input").val(buy_number);
             }
             var goods_id=_this.parents("tr").attr("goods_id");
             changeNumber(goods_id,buy_number);
-            //重新获取小计(传一个商品id和_this,不能直接在前台用单价*数量,因为别人可以用F12更改,所以传到控制器进行处理)
             getTotal(goods_id,_this);
-            //当前复选框状态变为选中
             trChecked(_this);
-            //重新获取总价
             getMoney();
         });
         $(document).on("click",'.less',function(){
-            var _this=$(this);   //当前点击的-号
-            var buy_number=parseInt(_this.next("input").val()); //获取购买数量的值
-            if(buy_number<=1){       //如果小于等于1
-                _this.next("input").val(1);  //把购买数量变成1
-                return false;            //程序终止
+            var _this=$(this);
+            var buy_number=parseInt(_this.next("input").val());
+            if(buy_number<=1){
+                _this.next("input").val(1);
+                return false;
             }else{
-                buy_number=buy_number-1;     //否则正常-1
-                _this.next("input").val(buy_number); //把-1后的值放回去
+                buy_number=buy_number-1;
+                _this.next("input").val(buy_number);
             }
-            //修改数据库的购买数量
-            //获取商品id
             var goods_id=_this.parents("tr").attr("goods_id");
             changeNumber(goods_id,buy_number);
-            //重新获取小计
             getTotal(goods_id,_this);
-            //当前复选框状态变为选中
             trChecked(_this);
-            //重新获取总价
             getMoney();
         });
         $(document).on("blur",'.buy_number',function(){
-            var _this=$(this);    //当前失去焦点的文本框
-            var buy_number=_this.val(); //获取购买数量的值
-            var goods_num=parseInt(_this.parents("tr").attr("goods_num")); //获取到库存的值
-            var reg=/^\d+$/;            //正则验证是不是数字
-            if(buy_number==''||!reg.test(buy_number)||parseInt(buy_number)<1){     //如果是空,不是数字,小于1的话
-                _this.val(1);                                                       //把值变为1
-            }else if(parseInt(buy_number)>=goods_num) {                             //如果大于等于库存
-                _this.val(goods_num);                                               //值变为库存
+            var _this=$(this);
+            var buy_number=_this.val();
+            var goods_num=parseInt(_this.parents("tr").attr("goods_num"));
+            var reg=/^\d+$/;
+            if(buy_number==''||!reg.test(buy_number)||parseInt(buy_number)<1){
+                _this.val(1);
+            }else if(parseInt(buy_number)>=goods_num) {
+                _this.val(goods_num);
             }else{
-                _this.val(parseInt(buy_number));                                    //如果用户输入0几,就把它转化一下放回去
+                _this.val(parseInt(buy_number));
             }
             buy_number=_this.val();
-            var goods_id=_this.parents("tr").attr("goods_id");  //获取商品id
-            //修改数据库的购买数量(不管是加还是减,直接改数据库的值,传过去一个商品id和购买数量)
+            var goods_id=_this.parents("tr").attr("goods_id");
             changeNumber(goods_id,buy_number);
-            //重新获取小计(传一个商品id和_this,不能直接在前台用单价*数量,因为别人可以用F12更改,所以传到控制器进行处理)
             getTotal(goods_id,_this);
-            //当前复选框状态变为选中
             trChecked(_this);
-            //重新获取总价
             getMoney();
         });
+        $(document).on('click','.box',function(){
+            var box=$('.box').parents('tr').attr('goods_id');
+            getMoney();
+        })
         function trChecked(_this){
             _this.parents("tr").find(".box").prop("checked",true);
         }
@@ -133,7 +125,7 @@
                 data:{goods_id:goods_id,buy_number:buy_number},
                 type:'post',
                 dataType:'json',
-                async:false,  //这里用同步,必须先把购买数量改完才能进行下一步的计算小计
+                async:false,
                 success:function(res){
                     if(res.code==2){
                         alert(res.font);
@@ -159,23 +151,36 @@
         function getMoney() {
             var box = $(".box:checked");
             if (box.length < 1) {
-                //$("#money").text("￥0");
-                return false;           //如果没有选择,程序终止
+                $("#money").text("￥0");
+                return false;
             }
-            var goods_id = '';            //设置空串
-            box.each(function (index) {   //each循环,得到每一个商品id
-                goods_id += $(this).parents("tr").attr("goods_id") + ',';//拼接商品id
+            var goods_id = '';
+            box.each(function (index) {
+                goods_id += $(this).parents("tr").attr("goods_id") + ',';
             });
-            goods_id = goods_id.substr(0, goods_id.length - 1);//把最后一个逗号去掉
+            goods_id = goods_id.substr(0, goods_id.length - 1);
             $.ajax({
                 url: "/cart/getMoney",
-                data: {goods_id: goods_id},//ajax传值,传过去的可能是一个值,也可能是多个
+                data: {goods_id: goods_id},
                 type: 'post',
                 success: function (res) {
-                    $("#money").text(res);//用返回值替换总价
+                    $("#money").text('¥'+res);
                 }
             })
         }
+        $(document).on('click','.jiesuan',function(){
+            var box = $(".box:checked");
+            if(box.length<1){
+                alert('请选择商品');
+                return false;
+            }
+            var goods_id = '';
+            box.each(function (index) {
+                goods_id += $(this).parents("tr").attr("goods_id") + ',';
+            });
+            goods_id = goods_id.substr(0, goods_id.length - 1);
+            location.href='/pay/'+goods_id;
+        })
     })
 </script>
     @endsection
